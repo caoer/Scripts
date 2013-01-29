@@ -11,7 +11,15 @@ class BaiduSongDownloader < BaiduGeneric
   end
   
   def parse
-    self.onResponse(open(@url, :proxy => self.proxy, "Cookie" => @cookie))
+    file_name = self.cache_file(@url)
+
+    if File.exists?(file_name)
+      self.onResponse(self.read_from_cache(file_name))
+    else
+      file = open(@url, :proxy => self.proxy, "Cookie" => @cookie)
+      self.save_to_cache(file.read, file_name)
+      self.onResponse(self.read_from_cache(file_name))
+    end
   end
 
   def onResponse(response)
@@ -35,7 +43,6 @@ class BaiduSongDownloader < BaiduGeneric
   end
 
   def prepare_download(folder)
-    FileUtils.mkdir_p folder
     FileUtils.mkdir_p "#{@default_download_folder}/#{folder}"
     @filePath = "#{@default_download_folder}/#{folder}/#{@name}.mp3"
     puts "downloading song #{@name}"
@@ -64,8 +71,9 @@ class BaiduSongDownloader < BaiduGeneric
 
   def download_system(folder)
     if self.prepare_download(folder)
-      p "wget #{self.link} -O #{self.filePath}"
+      p "downloading #{self.link} to #{self.filePath}"
       `wget #{self.link} -O #{self.filePath}`
+      # system "aria2c -x 8 #{self.link} -o #{self.filePath}"
     else
       p "file #{self.filePath} already downloaded"
     end
@@ -80,5 +88,4 @@ end
 # b = BaiduSongDownloader.new(265543)
 
 # b.parse
-# b.log
-# b.download_system("2377")
+
