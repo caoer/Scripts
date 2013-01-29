@@ -79,36 +79,25 @@ class RetinaRezise
   end
 end
 
-if ARGV[0].nil?
-  p "use default folder name: 'retina'"
-  folder_name = "retina"
-else
-  folder_name = ARGV[0]
-  p "process folder: #{folder_name}"
-end
+# if ARGV[0].nil?
+#   p "use default folder name: 'retina'"
+#   folder_name = "retina"
+# else
+#   folder_name = ARGV[0]
+#   p "process folder: #{folder_name}"
+# end
 
-if ARGV[1].nil?
-  p "use default power_number as: 2"
-  power_number = 2
-else
-  power_number = ARGV[1]
-  p "use power_number as : #{power_number}"
-end
+# if ARGV[1].nil?
+#   p "use default power_number as: 2"
+#   power_number = 2
+# else
+#   power_number = ARGV[1]
+#   p "use power_number as : #{power_number}"
+# end
 
-hd_check = HdCheck.new(folder_name, 2)
-hd_check.check
+# hd_check = HdCheck.new(folder_name, 2)
+# hd_check.check
 
 resizer = RetinaRezise.new(folder_name)
 resizer.resize
-# if ARGV[0].nil?
-#   p "Put folder name as argument"
-# else
-#   Dir.glob("#{ARGV[0]}/**/*.png") { |file|
-#     open(file,"rb") do |fh|
-#       size = ImageSize.new(fh.read).get_size
-#       if size[0] % 2 != 0 || size[1] % 2 != 0
-#         p "#{size}-- File: #{file}"
-#       end
-#     end
-#   }
-# end
+
