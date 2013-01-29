@@ -67,16 +67,6 @@ class BaiduAlbumDownloader < BaiduGeneric
 
 end
 
-
-# album = BaiduAlbumDownloader.new "http://music.baidu.com/album/689097"
-# album = BaiduAlbumDownloader.new "http://music.baidu.com/artist/1077"
-album = BaiduAlbumDownloader.new "http://music.baidu.com/artist/1117"
-# album = BaiduAlbumDownloader.new "http://music.baidu.com/album/13058750"
-
-# album.hydra
-album.parse
-album.download_songs
-
 if ARGV[0].nil?
   puts "You need to login to baidu to set cookie in baidu_generic.rb"
   puts "If you are not in mainland china, you need to run unblock-youku"
@@ -87,5 +77,19 @@ if ARGV[0].nil?
   puts "example: ruby baidu_album_downloader.rb http://music.baidu.com/artist/1117 \n"
   puts "example: ruby baidu_album_downloader.rb http://music.baidu.com/album/689097 \n"
   puts "-----------------------------------------"
+else
+  album = BaiduAlbumDownloader.new ARGV[0]
+  album.parse
+  album.download_songs
 end
+
+# album = BaiduAlbumDownloader.new "http://music.baidu.com/album/689097"
+# album = BaiduAlbumDownloader.new "http://music.baidu.com/artist/1077"
+# album = BaiduAlbumDownloader.new "http://music.baidu.com/artist/1117"
+# album = BaiduAlbumDownloader.new "http://music.baidu.com/album/13058750"
+
+# album.hydra
+# album.parse
+# album.download_songs
+
 

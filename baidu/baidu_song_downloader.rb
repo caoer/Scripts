@@ -36,6 +36,7 @@ class BaiduSongDownloader < BaiduGeneric
 
   def prepare_download(folder)
     FileUtils.mkdir_p folder
+    FileUtils.mkdir_p "#{@default_download_folder}/#{folder}"
     @filePath = "#{@default_download_folder}/#{folder}/#{@name}.mp3"
     puts "downloading song #{@name}"
 
