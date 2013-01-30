@@ -2,7 +2,7 @@ require_relative "baidu_generic"
 require 'fileutils'
 
 class BaiduSongDownloader < BaiduGeneric
-  attr_accessor :id, :link, :filePath, :name
+  attr_accessor :id, :link, :filePath, :name, :xcode, :album_delegate
 
   def initialize(id)
     @id = id  
@@ -10,6 +10,18 @@ class BaiduSongDownloader < BaiduGeneric
     super()
   end
   
+  def get_xcode
+    #update attribe with network data
+    onResponse(open(@url, :proxy => self.proxy, "Cookie" => @cookie))
+    xcode = @link.split("xcode=")[-1]
+    puts "updated xcode:#{xcode}".red.on_blue
+    xcode
+  end
+
+  def update_xocde_with_link
+    @link = @link.split("xcode=")[0] + "xcode=#{@xcode}"
+  end
+
   def parse
     file_name = self.cache_file(@url)
 
@@ -28,8 +40,12 @@ class BaiduSongDownloader < BaiduGeneric
       json = JSON.parse(high_res["data-data"])
       @link = "http" + json["link"].split("http")[1]
 
+      if @xcode != nil
+        self.update_xocde_with_link
+      end
+
       @name = doc.css(".song-link-hook")[0]["title"]
-      puts "Got mp3 link: " + @link
+      puts "Got mp3 link: #{@link}".green
   end
 
   def request
@@ -45,7 +61,7 @@ class BaiduSongDownloader < BaiduGeneric
   def prepare_download(folder)
     FileUtils.mkdir_p "#{@default_download_folder}/#{folder}"
     @filePath = "#{@default_download_folder}/#{folder}/#{@name}.mp3"
-    puts "downloading song #{@name}"
+    puts "downloading song #{@name}".blue
 
     can_download = true
 
@@ -54,6 +70,7 @@ class BaiduSongDownloader < BaiduGeneric
       if file.size > 0
         can_download = false
       end 
+      file.close
     end
 
     can_download
@@ -71,12 +88,29 @@ class BaiduSongDownloader < BaiduGeneric
 
   def download_system(folder)
     if self.prepare_download(folder)
-      p "downloading #{self.link} to #{self.filePath}"
+      puts "downloading #{self.link} to #{self.filePath}".yellow
       `wget #{self.link} -O #{self.filePath}`
       # system "aria2c -x 8 #{self.link} -o #{self.filePath}"
     else
-      p "file #{self.filePath} already downloaded"
+      puts "file #{self.filePath} already downloaded, skip it".red
     end
+
+    if self.finish_download?
+      @album_delegate.downloaded_album_count += 1
+    end
+  end
+
+  def finish_download?
+    if File.exists?(self.filePath)
+      file = File.open(self.filePath, "r")
+      if file.size < 100
+        false
+      else
+        true
+      end
+    else
+      false    
+    end  
   end
 
   def log
@@ -86,6 +120,5 @@ class BaiduSongDownloader < BaiduGeneric
 end
 
 # b = BaiduSongDownloader.new(265543)
-
 # b.parse
 

@@ -5,3 +5,4 @@ gem "imagesize"
 gem 'rmagick'
 gem 'nokogiri'
 gem 'typhoeus'
+gem 'colorize'

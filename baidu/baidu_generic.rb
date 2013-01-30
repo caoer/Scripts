@@ -3,6 +3,7 @@ require 'open-uri'
 require 'json'
 require 'typhoeus'
 require 'digest/sha1'
+require 'colorize'
 
 class BaiduGeneric
   attr_accessor :proxy, :cookie, :hydra, :log_file, :default_download_folder, 

@@ -2,18 +2,22 @@ require_relative "baidu_generic"
 require_relative "baidu_song_downloader"
 
 class BaiduAlbumDownloader < BaiduGeneric
-  attr_accessor :url, :doc, :songs, :id, :author
+  attr_accessor :url, :doc, :songs, :id, :author, :xcode, :downloaded_album_count
 
   def initialize(url)
     @url = url
     @id = @url.split("/")[-1]
     @songs = []
+    @retry_count = 0
+    @max_retry_count = 10
+    @downloaded_album_count = 0
+
     super()
   end
 
   def parse
     if File.exists?(self.cache_file @url)
-      puts "using cache"
+      puts "using cache".red.on_blue
       f = self.read_from_cache(self.cache_file(@url))
     else
       f = open(@url)
@@ -29,19 +33,37 @@ class BaiduAlbumDownloader < BaiduGeneric
       @author = item["songItem"]["author"]
       self.log
     end
+    
+    # update xcode
+    song_list.each do |song|
+      song_xcode = BaiduSongDownloader.new(JSON.parse(song["data-songitem"])["songItem"]["sid"])
+      begin
+        @xcode = song_xcode.get_xcode
+        break
+      rescue Exception => e
+        next
+      end
+    end
 
     song_list.each do |song|
       item = JSON.parse song["data-songitem"]
       sid = item["songItem"]["sid"]
       song_downloader = BaiduSongDownloader.new sid
+      song_downloader.xcode = @xcode
+      song_downloader.album_delegate = self
+
       @songs << song_downloader
       begin
         song_downloader.parse
         song_downloader.log
       rescue Exception => e
-        puts "Unabled to download song #{sid}"
+        puts "Unabled to download song #{sid}".red
+        # plus downloaded_album_count to avoid download this song
+        @downloaded_album_count += 1
       end
     end
+  
+
   end
 
   def hydra
@@ -56,7 +78,7 @@ class BaiduAlbumDownloader < BaiduGeneric
       begin
         @hydra.queue(song_downloader.request)
       rescue Exception => e
-        puts "Unabled to download song #{sid}"
+        puts "Unabled to download song #{sid}".red
       end
     end
 
@@ -64,9 +86,18 @@ class BaiduAlbumDownloader < BaiduGeneric
   end
 
   def download_songs
-    @songs.each do |song|
-      song.download_system @author
+    while @downloaded_album_count < songs.length && @retry_count < @max_retry_count
+      @retry_count += 1
+      puts "trying to download in #{@retry_count} time".green
+      @songs.each do |song|
+        song.download_system @author
+      end
     end
+
+    if @retry_count == @max_retry_count
+      puts "Reach Max Rety Count".red.on_yellow
+    end
+
   end
 
   def log
