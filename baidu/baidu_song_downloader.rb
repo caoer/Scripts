@@ -61,6 +61,7 @@ class BaiduSongDownloader < BaiduGeneric
   def prepare_download(folder)
     FileUtils.mkdir_p "#{@default_download_folder}/#{folder}"
     FileUtils.mkdir_p "#{@temp_folder}/#{folder}"
+    @name = @name.split('\'').join("")
 
     @file_path = "#{@default_download_folder}/#{folder}/#{@name}.mp3"
     @temp_path = "#{@temp_folder}/#{folder}/#{@name}.mp3"
@@ -68,13 +69,9 @@ class BaiduSongDownloader < BaiduGeneric
     puts "downloading song #{@name}".blue
 
     can_download = true
-
-    if File.exists?(@file_path)
-      file = File.open(@file_path, "r")
-      if file.size > 0
-        can_download = false
-      end 
-      file.close
+    
+    if self.finish_download?
+      can_download = false
     end
 
     can_download
@@ -111,10 +108,10 @@ class BaiduSongDownloader < BaiduGeneric
     end
   end
 
-  def finish_download?
-    if File.exists?(self.file_path)
-      file = File.open(self.file_path, "r")
-      if file.size < 100
+  def finish_download? (path = self.file_path)
+    if File.exists?(path)
+      file = File.open(path, "r")
+      if file.size < 1000
         false
       else
         true
