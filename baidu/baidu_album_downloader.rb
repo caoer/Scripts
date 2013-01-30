@@ -102,10 +102,12 @@ class BaiduAlbumDownloader < BaiduGeneric
       @songs.each do |song|
         song.xcode = @xcode
       end
+    else
+      puts "Congratulations! You've finished download!!".blue
     end
 
     if @retry_count == @max_retry_count
-      puts "Reach Max Rety Count".red.on_yellow
+      puts "Reach Max Rety Count. Something worng! Please Try Again.".red.on_yellow
     end
 
   end

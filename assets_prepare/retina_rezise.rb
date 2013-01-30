@@ -30,29 +30,61 @@ require "image_size"
 require "open-uri"
 require 'rmagick'
 require 'fileutils'
+require 'colorize'
 
 class RetinaRezise
   def initialize(args)
 
   end
 
-  def self.resize(source_folder, target_folder)
+  def self.resize(source_folder, target_folder, opt = {})
+    opt = {
+      :overwrite => true,
+      :suffix => :none,
+    }.merge(opt)
+    puts opt
     Dir.glob("#{source_folder}/**/*.png").each do |image_path|
-      GC.start
 
-      image = Magick::Image::read(image_path).first
-      image = image.resize(image.columns / 2, image.rows / 2, Magick::LanczosFilter)
-      new_path = image_path.sub(/"#{source_folder}"/, 'target_folder')
+      new_path = image_path.sub(source_folder, target_folder)
+      if opt[:suffix] != :none
+        last_elements = new_path.split("/")[-1].split(".")
+        puts "#{new_path} name error! can't contain .".red if last_elements.size != 2
+        new_file_name = "#{last_elements[0]}#{opt[:suffix]}.#{last_elements[1]}"
+        puts "#{new_file_name}".red
+      end
+
       path_array = new_path.split('/')
       dir_path = path_array.first(path_array.size - 1).join("/")
       FileUtils.mkdir_p dir_path
-      image.write new_path do 
-        self.quality=100
+
+      if File.exists?(new_path)
+        if opt[:overwrite]
+          puts "overwrote #{new_path}".red
+          self.resize_image(image_path, new_path) 
+        else
+          puts "#{new_path} exists, skip".yellow
+        end
+      else
+        puts "resized #{new_path}".green
+        self.resize_image(image_path, new_path) 
       end
-
-      image.destroy!
-
     end
+  end
+
+  private
+
+  def self.resize_image(image_path, new_path)
+    GC.start
+
+    image = Magick::Image::read(image_path).first
+    image = image.resize(image.columns / 2, image.rows / 2, Magick::LanczosFilter)
+
+    puts new_path
+    image.write new_path do 
+      self.quality=100
+    end
+
+    image.destroy!
   end
 end
 
@@ -75,3 +107,5 @@ end
 # hd_check = HdCheck.new(folder_name, 2)
 # hd_check.check
 
+# RetinaRezise.resize("assets/ipad-hd", "assets/ipad", :overwrite => false, :suffix => "-ipad")
+RetinaRezise.resize("assets/ipad-hd", "assets/ipad", :overwrite => false)
