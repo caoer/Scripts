@@ -89,7 +89,7 @@ class BaiduSongDownloader < BaiduGeneric
   def download_system(folder)
     if self.prepare_download(folder)
       puts "downloading #{self.link} to #{self.filePath}".yellow
-      `wget #{self.link} -O #{self.filePath}`
+      `wget #{self.link} -O "#{self.filePath}"`
       # system "aria2c -x 8 #{self.link} -o #{self.filePath}"
     else
       puts "file #{self.filePath} already downloaded, skip it".red

@@ -15,6 +15,18 @@ class BaiduAlbumDownloader < BaiduGeneric
     super()
   end
 
+  def update_xcode
+    @song_list_html.each do |song|
+      song_xcode = BaiduSongDownloader.new(JSON.parse(song["data-songitem"])["songItem"]["sid"])
+      begin
+        @xcode = song_xcode.get_xcode
+        break
+      rescue Exception => e
+        next
+      end
+    end
+  end
+
   def parse
     if File.exists?(self.cache_file @url)
       puts "using cache".red.on_blue
@@ -26,26 +38,17 @@ class BaiduAlbumDownloader < BaiduGeneric
     end
 
     @doc = Nokogiri::HTML(f)
-    song_list = @doc.css(".song-list ul li")
+    @song_list_html = @doc.css(".song-list ul li")
 
-    if song_list.length > 0
-      item = JSON.parse song_list[0]["data-songitem"]
+    if @song_list_html.length > 0
+      item = JSON.parse @song_list_html[0]["data-songitem"]
       @author = item["songItem"]["author"]
       self.log
     end
-    
-    # update xcode
-    song_list.each do |song|
-      song_xcode = BaiduSongDownloader.new(JSON.parse(song["data-songitem"])["songItem"]["sid"])
-      begin
-        @xcode = song_xcode.get_xcode
-        break
-      rescue Exception => e
-        next
-      end
-    end
 
-    song_list.each do |song|
+    self.update_xcode
+
+    @song_list_html.each do |song|
       item = JSON.parse song["data-songitem"]
       sid = item["songItem"]["sid"]
       song_downloader = BaiduSongDownloader.new sid
@@ -91,6 +94,13 @@ class BaiduAlbumDownloader < BaiduGeneric
       puts "trying to download in #{@retry_count} time".green
       @songs.each do |song|
         song.download_system @author
+      end
+    end
+
+    if @downloaded_album_count < songs.length
+      self.update_xcode
+      @songs.each do |song|
+        song.xcode = @xcode
       end
     end
 
