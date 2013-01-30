@@ -8,8 +8,8 @@
 
 # Example: 
 
-      ruby baidu_album_downloader.rb http://music.baidu.com/artist/1117 \n
-      ruby baidu_album_downloader.rb http://music.baidu.com/album/689097 \n
+      ruby baidu_album_downloader.rb http://music.baidu.com/artist/1117 
+      ruby baidu_album_downloader.rb http://music.baidu.com/album/689097 
 
 
 
