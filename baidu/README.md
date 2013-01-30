@@ -28,7 +28,24 @@ Then you are good to downloading baidu mp3s
       ruby baidu_album_downloader.rb http://music.baidu.com/album/689097 
 
 
+# Some Requirements 
+
+You need Ruby 1.9.3 to run this script. It's recommend to use RVM to install Ruby. In order to install Ruby on RVM, you need to install Homebrew to intalll other dependency. 
+
+Install Homebrew
+
+`ruby -e "$(curl -fsSkL raw.github.com/mxcl/homebrew/go)"`
+
+Insatll RVM
+
+`curl -L https://get.rvm.io | bash -s stable --ruby`
+
+if it fails, run
+`rvm requirements`
+to find out which lib you should install
+
+Install Ruby 1.9.3
+
+`rvm install 1.9.3`
 
 # TODO: 
-
-* sometimes downloading is being intterupt. need to add ability to recover from it. Like add a temperaty folder. After downloaded, it copy file to dest location
