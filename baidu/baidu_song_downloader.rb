@@ -93,9 +93,10 @@ class BaiduSongDownloader < BaiduGeneric
       # `wget #{self.link} -O "#{@temp_path}"`
       # system "aria2c -x 8 #{self.link} -o #{self.file_path}"
       # Allow max downloading time 12.8 mins
-      system "curl -o '#{@temp_path}' #{self.link} --max-time 768"
+      downloaded = system "curl -o '#{@temp_path}' #{self.link} --max-time 768"
 
-      if File.exists? @temp_path
+      # if File.exists? @temp_path
+      if downloaded
         FileUtils.mv @temp_path, @file_path
       end
     else
