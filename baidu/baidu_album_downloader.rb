@@ -128,7 +128,6 @@ if ARGV[0].nil?
   puts "If you are not in mainland china, you need to run unblock-youku"
   puts "install nodejs first, then run 'node server.js'"
   puts "log file is in download_index.txt, this script can detect songs alreday downloaded so it won't download again"
-  puts "if wget failed, its probably because session expired, run this script again will solve the problem"
   puts "-----------------------------------------"
   puts "example: ruby baidu_album_downloader.rb http://music.baidu.com/artist/1117 \n"
   puts "example: ruby baidu_album_downloader.rb http://music.baidu.com/album/689097 \n"
