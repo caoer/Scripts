@@ -40,21 +40,24 @@ class RetinaRezise
   def self.resize(source_folder, target_folder, opt = {})
     opt = {
       :overwrite => true,
-      :suffix => :none,
+      :new_suffix => :none,
+      :old_suffix => :none,
     }.merge(opt)
     puts opt
     Dir.glob("#{source_folder}/**/*.png").each do |image_path|
 
       new_path = image_path.sub(source_folder, target_folder)
-      if opt[:suffix] != :none
+      if opt[:old_suffix] != :none and opt[:new_suffix] != :none
         last_elements = new_path.split("/")[-1].split(".")
         puts "#{new_path} name error! can't contain .".red if last_elements.size != 2
-        new_file_name = "#{last_elements[0]}#{opt[:suffix]}.#{last_elements[1]}"
-        puts "#{new_file_name}".red
+        new_file_name = last_elements[0].split(opt[:old_suffix]).join("")
+        new_file_name = "#{new_file_name}#{opt[:new_suffix]}.#{last_elements[1]}"
       end
 
       path_array = new_path.split('/')
       dir_path = path_array.first(path_array.size - 1).join("/")
+      new_path = dir_path + "/" + new_file_name unless new_file_name == nil
+
       FileUtils.mkdir_p dir_path
 
       if File.exists?(new_path)
@@ -107,5 +110,11 @@ end
 # hd_check = HdCheck.new(folder_name, 2)
 # hd_check.check
 
-# RetinaRezise.resize("assets/ipad-hd", "assets/ipad", :overwrite => false, :suffix => "-ipad")
-RetinaRezise.resize("assets/ipad-hd", "assets/ipad", :overwrite => false)
+# RetinaRezise.resize("assets/ipad-hd", "assets/ipad", :overwrite => false, :new_suffix => "-ipad")
+RetinaRezise.resize("assets/images/apple/iphonehd", "assets/images/apple/iphone", :old_suffix => "@2x~iphone", :new_suffix => "~iphone", :overwrite => false)
+RetinaRezise.resize("assets/iphonehd", "assets/iphone", :overwrite => false)
+RetinaRezise.resize("assets/images/cocos2d/iphonehd", "assets/images/cocos2d/iphone", :old_suffix => "-hd", :new_suffix => "", :overwrite => false)
+
+
+
+

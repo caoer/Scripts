@@ -26,17 +26,20 @@ class BaiduSongDownloader < BaiduGeneric
     file_name = self.cache_file(@url)
 
     if File.exists?(file_name)
-      self.onResponse(self.read_from_cache(file_name))
+      file = self.read_from_cache(file_name)
+      self.onResponse(file)
     else
       file = open(@url, :proxy => self.proxy, "Cookie" => @cookie)
       self.save_to_cache(file.read, file_name)
-      self.onResponse(self.read_from_cache(file_name))
+      new_file = self.read_from_cache(file_name)
+      self.onResponse(new_file)
     end
   end
 
   def onResponse(response)
       doc =  Nokogiri::HTML(response)
       high_res = doc.css(".high-rate")[0]
+      high_res = doc.css("form ul li:last")[0] if high_res == nil
       json = JSON.parse(high_res["data-data"])
       @link = "http" + json["link"].split("http")[1]
 
