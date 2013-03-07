@@ -11,7 +11,7 @@ class BaiduGeneric
   def initialize
       @proxy = "http://0.0.0.0:8888"
       @cookie = "BAIDUID=689F6BC2253EDBF9E55B8C1189D992AE:FG=1; BAIDU_WISE_UID=bd_1353034968_829; BDUSS=jluLVByUHRTYVM2M1NyWWIxZEhPS0ZqZklVQVd0RjFvWXNKQlN4eGlyeEwzcUZSQVFBQUFBJCQAAAAAAAAAAAoqzCs5Hi0KY29vcGVyaGVhZF9tZQAAAAAAAAAAAAAAAAAAAAAAAACAYIArMAAAALDmpXwAAAAA6p5DAAAAAAAxMC4yNi4xOUuQtFBLkLRQa; BDUT=31pa689F6BC2253EDBF9E55B8C1189D992AE13a869a359b0"
-      @hydra = Typhoeus::Hydra.new(:max_concurrency => 20, :timeout => 200)
+      # @hydra = Typhoeus::Hydra.new(:max_concurrency => 20, :timeout => 200)
       @default_download_folder = "songs"
       @default_log_folder = "logs"
       @log_file = "#{@default_log_folder}/download_index.txt"
